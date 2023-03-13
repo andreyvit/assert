@@ -64,11 +64,12 @@ if assert.NonNil(t, obj) {
 }
 ```
 
-You can pass an extra message with Printf-style arguments to each:
+You can pass an extra message with Printf-style arguments to each, which will prefix the standard message:
 
 ```go
 assert.Eq(t, items[i].Foo, 42, "items[%d].Foo", i)
 assert.Eq(t, items[i].Bar, 10, "items[%d].Bar", i)
+// ** items[7].Bar: got 15, wanted 10
 ```
 
 
