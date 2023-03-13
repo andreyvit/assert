@@ -64,6 +64,13 @@ if assert.NonNil(t, obj) {
 }
 ```
 
+You can pass an extra message with Printf-style arguments to each:
+
+```go
+assert.Eq(t, items[i].Foo, 42, "items[%d].Foo", i)
+assert.Eq(t, items[i].Bar, 10, "items[%d].Bar", i)
+```
+
 
 Why this library?
 -----------------
