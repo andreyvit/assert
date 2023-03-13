@@ -74,7 +74,8 @@ There are many alternatives. Here's why this is the best one.
 2. Zero magic. We use Go generics for type safety instead of the typical fuzzy comparison logic. (E.g. consider `assert.Eq(t, value, 42)` when value is int64. If the arguments are typed as `any`, they won't be equal. Either you have to write `int64(42)`, or the library needs runtime fuzzy logic to treat all integer types as equal.)
 3. Allows adding extra message prefix for test failures.
 4. Allows writing your custom assertions in the same style.
-5. Zero dependencies, 100% coverage.
+5. Follows (actual, expected) argument order customary for Go (and uses got/wanted message wording, too). Duh, but some otherwise reasonable libs mess that up.
+6. Zero dependencies, 100% coverage.
 
 
 What if I want an assertion that you don't have?
@@ -145,6 +146,14 @@ We recommend [modd](https://github.com/cortesi/modd) (`go install github.com/cor
 Maintain 100% coverage. It's not often the right choice, but it is for this library.
 
 Ensure that all assertions produce clear, meaningful and helpful error messages.
+
+
+FAQ
+---
+
+### Why do you require Go 1.20?
+
+It's generics: we need `any` values passed in to be treated as `comparable`.
 
 
 MIT license
