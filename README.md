@@ -29,6 +29,8 @@ assert.OK(t, Bar())
 Usage
 -----
 
+Install via `go get github.com/andreyvit/assert`, then:
+
 ```go
 assert.OK(t, found)
 assert.False(t, found)
