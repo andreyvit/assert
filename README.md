@@ -147,6 +147,10 @@ Maintain 100% coverage. It's not often the right choice, but it is for this libr
 
 Ensure that all assertions produce clear, meaningful and helpful error messages.
 
+TODO:
+
+- [ ] Figure out if there's a way to build universal `assert.Empty` to replace `EmptyMap` and `EmptySlice` that meets all expectations that users would immediately assign to such function (i.e. works on strings, numbers, structs, etc). Or maybe this can be built without reflection to just work on the types we explicitly support? Do we even want a func like that, or is that too much magic? Alternatively, choose to extend `assert.Zero` to consider empty slices and maps to be zero values too.
+
 
 FAQ
 ---
