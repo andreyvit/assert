@@ -29,7 +29,11 @@ assert.OK(t, Bar())
 Usage
 -----
 
-Install via `go get github.com/andreyvit/assert`, then:
+Install:
+
+    go get github.com/andreyvit/assert
+
+Use:
 
 ```go
 assert.OK(t, found)
