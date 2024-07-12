@@ -82,6 +82,26 @@ func NotDeepEqual[T any](t TB, a, e T, messageAndArgs ...any) bool {
 	return true
 }
 
+// MethodEqual asserts that two values are equal via their Equal method (like time.Time).
+func MethodEqual[T interface{ Equal(T) bool }](t TB, a, e T, messageAndArgs ...any) bool {
+	t.Helper()
+	if !e.Equal(a) {
+		t.Errorf("** %sgot %v, wanted %v", FormatPrefix(messageAndArgs), a, e)
+		return false
+	}
+	return true
+}
+
+// NotMethodEqual asserts that two values are not equal via their Equal method (like time.Time).
+func NotMethodEqual[T interface{ Equal(T) bool }](t TB, a, e T, messageAndArgs ...any) bool {
+	t.Helper()
+	if e.Equal(a) {
+		t.Errorf("** %sgot %v, wanted anything else", FormatPrefix(messageAndArgs), a)
+		return false
+	}
+	return true
+}
+
 // Nil asserts that a pointer value is nil.
 //
 // Use Zero for interface values. Nil is
