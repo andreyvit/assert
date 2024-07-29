@@ -169,6 +169,16 @@ func TestFormatPrefix_panic(t *testing.T) {
 	}, "when passing messageAndArgs to assertion funcs, the first extra argument must be a format string, got int 42")
 }
 
+func TestAddPrefix_empty(t *testing.T) {
+	assert.DeepEqual(t, assert.AddPrefix(nil, "foo.%d", 42), []any{"foo.%d", 42})
+}
+func TestAddPrefix_existing(t *testing.T) {
+	assert.DeepEqual(t, assert.AddPrefix([]any{"bar %s", "boz"}, "foo.%d", 42), []any{"foo.%d: bar %s", 42, "boz"})
+}
+func TestAddPrefix_notstr(t *testing.T) {
+	assert.DeepEqual(t, assert.AddPrefix([]any{1, 2, 3}, "foo.%d", 42), []any{"foo.%d", 42, 1, 2, 3})
+}
+
 func panickyFunc() {
 	a := make([]int, 2)
 	a[2] = 42

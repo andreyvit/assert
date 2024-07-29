@@ -268,3 +268,14 @@ func FormatPrefix(messageAndArgs []any) string {
 		panic(fmt.Errorf("when passing messageAndArgs to assertion funcs, the first extra argument must be a format string, got %T %v", messageAndArgs[0], messageAndArgs[0]))
 	}
 }
+
+// AddPrefix adds a prefix to assertion call's messageAndArgs argument.
+func AddPrefix(messageAndArgs []any, prefix string, args ...any) []any {
+	if len(messageAndArgs) > 0 {
+		if msg, ok := messageAndArgs[0].(string); ok {
+			prefix = prefix + ": " + msg
+			messageAndArgs = messageAndArgs[1:]
+		}
+	}
+	return append(append([]any{prefix}, args...), messageAndArgs...)
+}
