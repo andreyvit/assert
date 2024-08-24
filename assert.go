@@ -202,6 +202,7 @@ func Success(t TB, a error, messageAndArgs ...any) bool {
 // If the expected error is nil, behaves exactly like Success.
 func Error(t TB, a, e error, messageAndArgs ...any) bool {
 	if e == nil {
+		t.Helper()
 		return Success(t, a, messageAndArgs...)
 	} else if a == nil {
 		t.Helper()
