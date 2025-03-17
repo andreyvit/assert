@@ -14,17 +14,31 @@ import (
 	"reflect"
 )
 
-// TB contains the parts of testing.TB that this package actually needs. Pass *testing.T or *testing.B for arguments of type TB.
+// TB contains the parts of testing.TB that this package actually needs.
+// Pass *testing.T or *testing.B for arguments of type TB.
+//
+// WARNING: More methods from testing.TB may be added here in the future.
 type TB interface {
 	Helper()
 	Errorf(format string, args ...any)
+	FailNow()
 }
+
+type fatal struct{}
+
+// Fatal can be passed into any of the assertion methods to abort the test
+// on failure.
+var Fatal = fatal{}
 
 // OK asserts that the value is true.
 func OK(t TB, a bool, messageAndArgs ...any) bool {
 	if !a {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot false, wanted true", FormatPrefix(messageAndArgs))
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -34,7 +48,11 @@ func OK(t TB, a bool, messageAndArgs ...any) bool {
 func False(t TB, a bool, messageAndArgs ...any) bool {
 	if a {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot true, wanted false", FormatPrefix(messageAndArgs))
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -44,7 +62,11 @@ func False(t TB, a bool, messageAndArgs ...any) bool {
 func Eq[T comparable](t TB, a, e T, messageAndArgs ...any) bool {
 	if a != e {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot %v, wanted %v", FormatPrefix(messageAndArgs), a, e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -54,7 +76,11 @@ func Eq[T comparable](t TB, a, e T, messageAndArgs ...any) bool {
 func NotEq[T comparable](t TB, a, e T, messageAndArgs ...any) bool {
 	if a == e {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot %v, wanted anything else", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -64,7 +90,11 @@ func NotEq[T comparable](t TB, a, e T, messageAndArgs ...any) bool {
 func DeepEqual[T any](t TB, a, e T, messageAndArgs ...any) bool {
 	if !reflect.DeepEqual(a, e) {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot %v, wanted %v", FormatPrefix(messageAndArgs), a, e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -76,7 +106,11 @@ func DeepEqual[T any](t TB, a, e T, messageAndArgs ...any) bool {
 func NotDeepEqual[T any](t TB, a, e T, messageAndArgs ...any) bool {
 	if reflect.DeepEqual(a, e) {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot %v, wanted anything else", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -86,7 +120,11 @@ func NotDeepEqual[T any](t TB, a, e T, messageAndArgs ...any) bool {
 func MethodEqual[T interface{ Equal(T) bool }](t TB, a, e T, messageAndArgs ...any) bool {
 	t.Helper()
 	if !e.Equal(a) {
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot %v, wanted %v", FormatPrefix(messageAndArgs), a, e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -96,7 +134,11 @@ func MethodEqual[T interface{ Equal(T) bool }](t TB, a, e T, messageAndArgs ...a
 func NotMethodEqual[T interface{ Equal(T) bool }](t TB, a, e T, messageAndArgs ...any) bool {
 	t.Helper()
 	if e.Equal(a) {
-		t.Errorf("** %sgot %v, wanted anything else", FormatPrefix(messageAndArgs), a)
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
+		t.Errorf("** %sgot %v, wanted something other than %v", FormatPrefix(messageAndArgs), a, e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -108,7 +150,11 @@ func NotMethodEqual[T interface{ Equal(T) bool }](t TB, a, e T, messageAndArgs .
 func Nil[T any, P ~*T](t TB, a P, messageAndArgs ...any) bool {
 	if a != nil {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot &%v, wanted nil", FormatPrefix(messageAndArgs), *a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -118,7 +164,11 @@ func Nil[T any, P ~*T](t TB, a P, messageAndArgs ...any) bool {
 func NonNil[T any](t TB, a *T, messageAndArgs ...any) bool {
 	if a == nil {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot nil %T, wanted non-nil", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -129,7 +179,11 @@ func Zero[T comparable](t TB, a T, messageAndArgs ...any) bool {
 	var zero T
 	if a != zero {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot %v, wanted zero value %v", FormatPrefix(messageAndArgs), a, zero)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -140,7 +194,11 @@ func NonZero[T comparable](t TB, a T, messageAndArgs ...any) bool {
 	var zero T
 	if a == zero {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot zero value %v, wanted non-zero", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -150,7 +208,11 @@ func NonZero[T comparable](t TB, a T, messageAndArgs ...any) bool {
 func EmptySlice[T any, S ~[]T](t TB, a S, messageAndArgs ...any) bool {
 	if len(a) > 0 {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot %v, wanted empty slice", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -160,7 +222,11 @@ func EmptySlice[T any, S ~[]T](t TB, a S, messageAndArgs ...any) bool {
 func NonEmptySlice[T any, S ~[]T](t TB, a S, messageAndArgs ...any) bool {
 	if len(a) == 0 {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot empty %T, wanted non-empty", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -170,7 +236,11 @@ func NonEmptySlice[T any, S ~[]T](t TB, a S, messageAndArgs ...any) bool {
 func EmptyMap[K comparable, V any, M ~map[K]V](t TB, a M, messageAndArgs ...any) bool {
 	if len(a) > 0 {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot %v, wanted empty map", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -180,7 +250,11 @@ func EmptyMap[K comparable, V any, M ~map[K]V](t TB, a M, messageAndArgs ...any)
 func NonEmptyMap[K comparable, V any, M ~map[K]V](t TB, a M, messageAndArgs ...any) bool {
 	if len(a) == 0 {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sgot empty %T, wanted non-empty", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -190,7 +264,11 @@ func NonEmptyMap[K comparable, V any, M ~map[K]V](t TB, a M, messageAndArgs ...a
 func Success(t TB, a error, messageAndArgs ...any) bool {
 	if a != nil {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sfailed: %v", FormatPrefix(messageAndArgs), a)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -206,11 +284,19 @@ func Error(t TB, a, e error, messageAndArgs ...any) bool {
 		return Success(t, a, messageAndArgs...)
 	} else if a == nil {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %ssucceeded, wanted to fail with: %v", FormatPrefix(messageAndArgs), e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	} else if !errors.Is(a, e) {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sfailed with: %v, wanted: %v", FormatPrefix(messageAndArgs), a, e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -224,11 +310,19 @@ func ErrorMsg(t TB, a error, e string, messageAndArgs ...any) bool {
 		return Success(t, a, messageAndArgs...)
 	} else if a == nil {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %ssucceeded, wanted to fail with: %v", FormatPrefix(messageAndArgs), e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	} else if s := a.Error(); s != e {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %sfailed with: %v, wanted: %v", FormatPrefix(messageAndArgs), s, e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -239,11 +333,19 @@ func PanicMsg(t TB, f func(), e string, messageAndArgs ...any) bool {
 	actual := capturePanic(f)
 	if actual == nil {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %ssucceeded, wanted to panic with: %v", FormatPrefix(messageAndArgs), e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	} else if a := fmt.Sprint(actual); a != e {
 		t.Helper()
+		isFatal, messageAndArgs := CheckFatal(messageAndArgs)
 		t.Errorf("** %spaniced with: %v, wanted: %v", FormatPrefix(messageAndArgs), a, e)
+		if isFatal {
+			t.FailNow()
+		}
 		return false
 	}
 	return true
@@ -255,6 +357,16 @@ func capturePanic(f func()) (panicValue any) {
 	}()
 	f()
 	return
+}
+
+// CheckFatal checks if Fatal is among the args, and removes it if found.
+func CheckFatal(args []any) (bool, []any) {
+	for i, arg := range args {
+		if _, ok := arg.(fatal); ok {
+			return true, append(args[:i], args[i+1:]...)
+		}
+	}
+	return false, args
 }
 
 // FormatPrefix returns a prefix for assertion error messages based on messageAndArgs arguments.

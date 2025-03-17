@@ -1,7 +1,7 @@
 Go assertion library in stdlib style
 ====================================
 
-[![Go reference](https://pkg.go.dev/badge/github.com/andreyvit/assert.svg)](https://pkg.go.dev/github.com/andreyvit/assert) ![Zero dependencies](https://img.shields.io/badge/deps-zero-brightgreen) ![Zero magic](https://img.shields.io/badge/magic-none-brightgreen) ![under 200 LOC](https://img.shields.io/badge/size-%3C200%20LOC-green) ![100% coverage](https://img.shields.io/badge/coverage-100%25-green) [![Go Report Card](https://goreportcard.com/badge/github.com/andreyvit/assert)](https://goreportcard.com/report/github.com/andreyvit/assert)
+[![Go reference](https://pkg.go.dev/badge/github.com/andreyvit/assert.svg)](https://pkg.go.dev/github.com/andreyvit/assert) ![Zero dependencies](https://img.shields.io/badge/deps-zero-brightgreen) ![Zero magic](https://img.shields.io/badge/magic-none-brightgreen) ![under 350 LOC](https://img.shields.io/badge/size-%3C350%20LOC-green) ![100% coverage](https://img.shields.io/badge/coverage-100%25-green) [![Go Report Card](https://goreportcard.com/badge/github.com/andreyvit/assert)](https://goreportcard.com/report/github.com/andreyvit/assert)
 
 
 Why?
@@ -76,6 +76,13 @@ You can pass an extra message with Printf-style arguments to each, which will pr
 assert.Eq(t, items[i].Foo, 42, "items[%d].Foo", i)
 assert.Eq(t, items[i].Bar, 10, "items[%d].Bar", i)
 // ** items[7].Bar: got 15, wanted 10
+```
+
+Pass `assert.Fatal` to fail the test on assertion mismatch:
+
+```go
+assert.Eq(t, len(items), 2, assert.Fatal)
+assert.Eq(t, items[1].Bar, 10)
 ```
 
 
