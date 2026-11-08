@@ -1,7 +1,7 @@
 Go assertion library in stdlib style
 ====================================
 
-[![Go reference](https://pkg.go.dev/badge/github.com/andreyvit/assert.svg)](https://pkg.go.dev/github.com/andreyvit/assert) ![Zero dependencies](https://img.shields.io/badge/deps-zero-brightgreen) ![Zero magic](https://img.shields.io/badge/magic-none-brightgreen) ![under 350 LOC](https://img.shields.io/badge/size-%3C350%20LOC-green) ![100% coverage](https://img.shields.io/badge/coverage-100%25-green) [![Go Report Card](https://goreportcard.com/badge/github.com/andreyvit/assert)](https://goreportcard.com/report/github.com/andreyvit/assert)
+[![Go reference](https://pkg.go.dev/badge/github.com/andreyvit/assert.svg)](https://pkg.go.dev/github.com/andreyvit/assert) ![Zero dependencies](https://img.shields.io/badge/deps-zero-brightgreen) ![Zero magic](https://img.shields.io/badge/magic-none-brightgreen) [![Go Report Card](https://goreportcard.com/badge/github.com/andreyvit/assert)](https://goreportcard.com/report/github.com/andreyvit/assert)
 
 
 Why?
@@ -29,11 +29,30 @@ assert.OK(t, Bar())
 Usage
 -----
 
+Requires Go 1.20 or newer.
+
 Install:
 
     go get github.com/andreyvit/assert
 
-Use:
+Save as `example_test.go` and run `go test`:
+
+```go
+package example_test
+
+import (
+	"testing"
+
+	"github.com/andreyvit/assert"
+)
+
+func TestAnswer(t *testing.T) {
+	got := 6 * 7
+	assert.Eq(t, got, 42)
+}
+```
+
+Available assertions:
 
 ```go
 assert.OK(t, found)
@@ -89,14 +108,14 @@ assert.Eq(t, items[1].Bar, 10)
 Why this library?
 -----------------
 
-There are many alternatives. Here's why this is the best one.
+Generics, (actual, expected) argument order, and custom assertion helpers keep tests close to ordinary Go.
 
 1. Tiny. A small set of straightforward assertions with simple code, not a port of some crazy BDD framework or assert.IsValidEmail-million-assertions library. We include what we think Go team would choose to include if this was a standard library package.
 2. Zero magic. We use Go generics for type safety instead of the typical fuzzy comparison logic. (E.g. consider `assert.Eq(t, value, 42)` when value is int64. If the arguments are typed as `any`, they won't be equal. Either you have to write `int64(42)`, or the library needs runtime fuzzy logic to treat all integer types as equal.)
 3. Allows adding extra message prefix for test failures.
 4. Allows writing your custom assertions in the same style.
-5. Follows (actual, expected) argument order customary for Go (and uses got/wanted message wording, too). Duh, but some otherwise reasonable libs mess that up.
-6. Zero dependencies, 100% coverage.
+5. Follows (actual, expected) argument order customary for Go (and uses got/wanted message wording, too).
+6. Zero dependencies.
 
 
 What if I want an assertion that you don't have?
